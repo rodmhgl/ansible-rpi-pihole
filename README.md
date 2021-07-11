@@ -4,9 +4,7 @@
 
 Setup your Raspberry Pi as Pi-Hole DNS server, WITHOUT WIFI (Ethernet Only).
 
-It is based on the [complete guide to setting up your raspberry pi without a keyboard and
-mouse](http://sendgrid.com/blog/complete-guide-set-raspberry-pi-without-keyboard-mouse/) that goes
-along with this repo and the work done by [Gaetan Semet](https://github.com/gsemet/ansible-rpi-pihole).
+It is based on the [complete guide to setting up your raspberry pi without a keyboard and mouse](http://sendgrid.com/blog/complete-guide-set-raspberry-pi-without-keyboard-mouse/) that goes along with this repo and the work done by [Gaetan Semet](https://github.com/gsemet/ansible-rpi-pihole).
 
 ## History
 
@@ -41,7 +39,7 @@ cp hosts.example hosts
 Edit the `hosts` file and set the IP address of your RPI (get this from the router or from the
 command line).
 
-Deploy using [ansible](http://www.ansible.com) (install instructions for ansible are in [requirements](#requirements) below).
+Deploy using [ansible](http://www.ansible.com).
 
 ```bash
 ./playbook.yml
@@ -50,26 +48,73 @@ Deploy using [ansible](http://www.ansible.com) (install instructions for ansible
 Or:
 
 ```bash
-ansible-playbook playbook.yml -i hosts --ask-pass --become -c paramiko
+ansible-playbook -i hosts playbook.yml -c pi
 ```
 
-## Installing Ansible on your computer
+## Tag Reference
 
-### On Mac with Homebrew
+The tags below can be used to run (or skip) specific portions of the playbook.
+
+This can be useful when you only need to update the whitelist / DHCP reservations / pihole configuration without waiting for the other portions to run.
+
+Run only the whitelist update:
 
 ```bash
-brew install ansible
+ansible-playbook -i hosts playbook.yml -c pi --tags=whitelist
 ```
 
-### On Mac without Homebrew
+Or save time while troubleshooting by skipping the package and ntp installations:
 
 ```bash
-cd /tmp
-git clone git://github.com/ansible/ansible.git
-cd ./ansible
-git checkout v1.4.3
-sudo make install
-sudo easy_install jinja2
-sudo easy_install pyyaml
-sudo easy_install paramiko
+ansible-playbook -i hosts playbook.yml -c pi --skip-tags "packages,ntp"
 ```
+
+### network
+
+- Setting hostname to 'pihole'
+- Configure static IP in /etc/dhcpcd.conf
+- Set Default DNS
+
+### admin
+
+- Disable WIFI and Bluetooth
+- Set default bash aliases
+
+### packages
+
+- Update APT package cache
+- Installing packages (python-apt, pip, vim, curl, telnet, wget)
+- Install grin (better grep)
+
+### ntp
+
+- Install NTP
+- Copy over the NTP configuration
+- Make sure NTP is started up
+
+### pihole
+
+- Download Pi-Hole installer
+- Create pihole group
+- Create pihole user
+- Create pihole configuration directory
+- Install Pi-Hole
+- Set PiHole to update every week
+
+### pihole-config
+
+- Create pihole configuration
+
+### reservations
+
+- Copy over the default reservations
+
+### whitelist
+
+- Copy over the whitelist script
+- Execute the whitelist script
+
+### restart
+
+- Reboot
+- Wait for Raspberry PI to come back

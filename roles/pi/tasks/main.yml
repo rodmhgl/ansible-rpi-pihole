@@ -41,14 +41,16 @@
     upgrade: safe
   tags: packages
 
-- name: Install admin tools
+- name: Installing packages (python-apt, pip, vim, curl, telnet, wget)
   apt:
     package: "{{ item }}"
-    state: present
+    state: latest
   with_items:
     - python-apt
     - python-pip
     - vim
+    - curl
+    - telnet
     - wget
   tags: packages
 
@@ -150,7 +152,7 @@
   template: src=files/whitelist.sh dest=/tmp/whitelist.sh
   tags: whitelist
 
-- name: Execute the command in remote shell; stdout goes to the specified file on the remote
+- name: Execute the whitelist script
   ansible.builtin.shell: chmod +x /tmp/whitelist.sh ; /tmp/whitelist.sh >> /tmp/whitelist_script.log
   tags: whitelist
 
