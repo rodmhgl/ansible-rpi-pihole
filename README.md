@@ -8,6 +8,12 @@ It is based on the [complete guide to setting up your raspberry pi without a key
 mouse](http://sendgrid.com/blog/complete-guide-set-raspberry-pi-without-keyboard-mouse/) that goes
 along with this repo and the work done by [Gaetan Semet](https://github.com/gsemet/ansible-rpi-pihole).
 
+## History
+
+My Raspbery Pi pi-hole routinely crashes due to SD corruption. Since it serves as my primary DNS and DHCP server, I needed a way to be able to quickly get it restored without needing to physically interface with the box. I'm also learning Ansible so it seemed natural to try and attack this problem with Ansible.
+
+I was able to find some starting points online and tweaked those to match my requirements. Hopefully this helps someone else out there get up and running quickly.
+
 ## Requirements
 
 - Flash a **clean** Raspbian Lite image on an SD card
@@ -67,9 +73,3 @@ sudo easy_install jinja2
 sudo easy_install pyyaml
 sudo easy_install paramiko
 ```
-
-## History
-
-My Raspbery Pi pi-hole routinely crashes due to SD corruption. Since it serves as my primary DNS and DHCP server, I needed a way to be able to quickly get it restored without needing to physically interface with the box. I'm also learning Ansible so it seemed natural to try and attack this problem with Ansible.
-
-I was able to find some starting points online and tweaked those to match my requirements. Hopefully this helps someone else out there get up and running quickly.
