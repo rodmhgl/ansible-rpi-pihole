@@ -1,6 +1,6 @@
 # ansible-pi
 
-![](https://raw.github.com/motdotla/ansible-pi/master/ansible-pi.jpg)
+![Ansible Pi Logo](https://raw.github.com/motdotla/ansible-pi/master/ansible-pi.jpg)
 
 Setup your Raspberry Pi as Pi-Hole DNS server, WITHOUT WIFI (Ethernet Only).
 
@@ -11,7 +11,7 @@ along with this repo and the work done by [Gaetan Semet](https://github.com/gsem
 ## Requirements
 
 - Flash a **clean** Raspbian Lite image on an SD card
-  URL: https://www.raspberrypi.org/downloads/raspbian/
+  URL: [https://www.raspberrypi.org/downloads/raspbian/](https://www.raspberrypi.org/downloads/raspbian/)
   Mac: Use [ApplePI-Baker](https://www.tweaking4all.com/software/macosx-software/macosx-apple-pi-baker/)
 - Enable SSH on the Raspberry (it is disabled by default). You can:
   - use `raspi-config` to enable SSH
