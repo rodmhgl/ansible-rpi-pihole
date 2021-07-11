@@ -70,6 +70,6 @@ sudo easy_install paramiko
 
 ## History
 
-My Raspbery Pi pi-hole routinely crashes due to SD corruption. I needed a way to be able to get it quickly up and running without needing to physically interface with the box. I'm also learning Ansible so it seemed natural to try and attack this problem with Ansible.
+My Raspbery Pi pi-hole routinely crashes due to SD corruption. Since it serves as my primary DNS and DHCP server, I needed a way to be able to quickly get it restored without needing to physically interface with the box. I'm also learning Ansible so it seemed natural to try and attack this problem with Ansible.
 
 I was able to find some starting points online and tweaked those to match my requirements. Hopefully this helps someone else out there get up and running quickly.
