@@ -6,7 +6,7 @@ Setup your Raspberry Pi as Pi-Hole DNS server, WITHOUT WIFI (Ethernet Only).
 
 It is based on the [complete guide to setting up your raspberry pi without a keyboard and
 mouse](http://sendgrid.com/blog/complete-guide-set-raspberry-pi-without-keyboard-mouse/) that goes
-along with this repo.
+along with this repo and the work done by [Gaetan Semet](https://github.com/gsemet/ansible-rpi-pihole).
 
 ## Requirements
 
@@ -27,7 +27,7 @@ along with this repo.
 On your local computer, clone and setup this ansible playbook.
 
 ```
-git clone https://github.com/stibbons/ansible-rpi-pihole.git
+git clone https://github.com/rodmhgl/ansible-rpi-pihole.git
 cd ansible-rpi-pihole
 cp hosts.example hosts
 ```
@@ -70,5 +70,6 @@ sudo easy_install paramiko
 
 ## History
 
-This project was originally built when trying out my first Raspberry Pi. The setup process was not
-as easy as I wanted.
+My Raspbery Pi pi-hole routinely crashes due to SD corruption. I needed a way to be able to get it quickly up and running without needing to physically interface with the box. I'm also learning Ansible so it seemed natural to try and attack this problem with Ansible.
+
+I was able to find some starting points online and tweaked those to match my requirements. Hopefully this helps someone else out there get up and running quickly.
