@@ -1,9 +1,22 @@
 ---
-
 - name: "Setting hostname to 'pihole'"
   hostname:
     name: pihole
-  tags: admin
+  tags: network
+
+- name: Configure static IP in /etc/dhcpcd.conf
+  become: yes
+  lineinfile:
+    dest:  /etc/dhcpcd.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  with_items:
+    - { regexp: "^interface eth[0-9]$", line: "interface {{ network_interface }}" }
+    - { regexp: "^static ip_address", line: "static ip_address={{ ipv4_address }}" }
+    - { regexp: "^static routers", line: "static routers={{ gateway_ip }}" }
+    - { regexp: "^static domain_name_servers", line: "static domain_name_servers={{ dns_servers }}" }
+  tags: network
 
 - name: 'Disable WIFI and Bluetooth'
   copy: src=./files/raspi-blacklist.conf dest=/etc/modprobe.d/raspi-blacklist.conf mode=0600
@@ -17,104 +30,99 @@
   apt:
     update_cache: yes
     upgrade: safe
-  tags: admin
-
-- name: Install admin tools (vim, htop, ntop, nmap)
+  tags: packages
+  
+- name: Install admin tools 
   apt:
     package: "{{ item }}"
-    state: installed
+    state: present 
   with_items:
     - python-apt
     - python-pip
     - vim
-    - htop
-    - ntop
-    - nmap
-    - atop
-  tags: admin
-
+    - wget
+  tags: packages
+  
 - name: Install grin (better grep)
   shell: pip install grin
-  tags: admin
+  tags: packages
 
 - name: Install NTP
   apt:
-    package: ntp
+    package: ["ntp","ntpdate"]
     state: present
   tags: ntp
 
 - name: Copy over the NTP configuration
   template: src=files/ntp.conf dest=/etc/ntp.conf
   notify:
-    - restart ntp
-    - force ntp update
+   - restart ntp
+   - force ntp update
   tags: ntp
 
 - name: Make sure NTP is started up
   service: name=ntp state=started enabled=yes
   tags: ntp
-
+  
 - name: "Download Pi-Hole installer"
   get_url:
       url: https://install.pi-hole.net
       dest: ~/install-pihole.sh
       mode: 0740
   tags: pihole
+  
+- name: create pihole group
+  become: True
+  group:
+    name: "{{ group_pihole }}"
+    state: present
+  tags: pihole
+
+- name: create pihole user
+  become: True
+  user:
+    name: "{{ user_pihole }}"
+    group: "{{ group_pihole }}"
+    groups: "{{ group_pihole }},{{ group_lighttpd }}"
+    comment: "ad filtering DNS proxy"
+    system: True
+    shell: "/usr/sbin/nologin"
+  tags: pihole
 
 - name: Create pihole configuration directory
   become: True
   file:
-    name="{{ fspath_pihole_config }}"
-    state=directory
-    owner="{{ user_pihole }}"
-    group="{{ group_pihole }}"
-    mode=0755
+    path: "{{ fspath_pihole_config }}"
+    state: directory
+    owner: "{{ user_pihole }}"
+    group: "{{ group_pihole }}"
+    mode: 0755
   tags: pihole
 
 - name: Create pihole configuration
   become: True
   template:
-    src="setupVars.conf.j2"
-    dest="{{ fspath_pihole_config }}/setupVars.conf"
-    owner=root
-    group=root
-    mode=0644
-  tags: pihole
-
-- name: Set static IP configuration
-  become: True
-  template:
-    src="etc_network_interfaces.j2"
-    dest="/etc/network/interfaces"
-    owner=root
-    group=root
-    mode=0644
-  tags: pihole
+    src: "setupVars.conf.j2"
+    dest: "{{ fspath_pihole_config }}/setupVars.conf"
+    owner: root
+    group: root
+    mode: 0644
+  tags: pihole-config
 
 - name: Set default DNS
   become: True
   template:
-    src="etc_resolf.conf.j2"
-    dest="/etc/resolv.conf"
-    owner=root
-    group=root
-    mode=0644
-  tags: admin
+    src: "etc_resolf.conf.j2"
+    dest: "/etc/resolv.conf"
+    owner: root
+    group: root
+    mode: 0644
+  tags: network
 
 - name: Install Pi-Hole
   shell: "~/install-pihole.sh --unattended"
   register: dbg_install_pihole
   tags: pihole
-
-- name: Set static IP configuration
-  become: True
-  template:
-    src="etc_network_interfaces.j2"
-    dest="/etc/network/interfaces"
-    owner=root
-    group=root
-    mode=0644
-  tags: admin
 
 - name: Set PiHole to update every week
   become: True
@@ -123,15 +131,29 @@
     regexp: '^#(.*updatePihole.*)$'
     replace: '\1'
     backup: yes
-  tags: admin
+  tags: pihole
+
+- name: Copy over the default reservations
+  template: src=files/04-pihole-static-dhcp.conf dest=/etc/dnsmasq.d/04-pihole-static-dhcp.conf
+  tags: reservations
+
+- name: Copy over the whitelist script
+  template: src=files/whitelist.sh dest=/tmp/whitelist.sh
+  tags: whitelist
+
+- name: Execute the command in remote shell; stdout goes to the specified file on the remote
+  ansible.builtin.shell: chmod +x /tmp/whitelist.sh ; /tmp/whitelist.sh >> /tmp/whitelist_script.log
+  tags: whitelist
 
 - name: 'Reboot'
   shell: sleep 2 && reboot
   async: 1
   poll: 0
   ignore_errors: true
-  tags: pihole
+  tags: restart
 
 - name: "Wait for Raspberry PI to come back"
   local_action: wait_for host={{ ansible_host }} port=22 state=started delay=10
   become: false
+  tags: restart
+
