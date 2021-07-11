@@ -14,8 +14,8 @@ along with this repo and the work done by [Gaetan Semet](https://github.com/gsem
   URL: https://www.raspberrypi.org/downloads/raspbian/
   Mac: Use [ApplePI-Baker](https://www.tweaking4all.com/software/macosx-software/macosx-apple-pi-baker/)
 - Enable SSH on the Raspberry (it is disabled by default). You can:
-    - use `raspi-config` to enable SSH
-    - create a file `/boot/ssh`
+  - use `raspi-config` to enable SSH
+  - create a file `/boot/ssh`
 - Find the IP address your router will give to the RPI
 - You need Ansible installed on your local computer (not the Raspberry Pi)
 - Install SSHPass:
@@ -26,7 +26,7 @@ along with this repo and the work done by [Gaetan Semet](https://github.com/gsem
 
 On your local computer, clone and setup this ansible playbook.
 
-```
+```bash
 git clone https://github.com/rodmhgl/ansible-rpi-pihole.git
 cd ansible-rpi-pihole
 cp hosts.example hosts
@@ -37,27 +37,27 @@ command line).
 
 Deploy using [ansible](http://www.ansible.com) (install instructions for ansible are in [requirements](#requirements) below).
 
-```
+```bash
 ./playbook.yml
 ```
 
 Or:
-```
+
+```bash
 ansible-playbook playbook.yml -i hosts --ask-pass --become -c paramiko
 ```
 
 ## Installing Ansible on your computer
 
-
 ### On Mac with Homebrew
 
-```
+```bash
 brew install ansible
 ```
 
 ### On Mac without Homebrew
 
-```
+```bash
 cd /tmp
 git clone git://github.com/ansible/ansible.git
 cd ./ansible
