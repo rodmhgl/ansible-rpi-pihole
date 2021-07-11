@@ -10,6 +10,6 @@
   handlers:
     - name: restart ntp
       service: name=ntp state=restarted
-  
+
     - name: force ntp update
       shell: "service ntp stop && ntpdate -s {{ timeserver  }} && service ntp start"
